@@ -1,6 +1,7 @@
 'use client'
 import Header from './components/Header'
 import React, { useState, useEffect } from 'react'
+import dynamic from 'next/dynamic'
 import {
   Box,
   Grid,
@@ -32,6 +33,13 @@ import { firestore } from '@/firebase'
 import AddIcon from '@mui/icons-material/Add'
 import RemoveIcon from '@mui/icons-material/Remove'
 import DeleteIcon from '@mui/icons-material/Delete'
+
+const Firestore = dynamic(
+  () => import('@/firebase').then((mod) => mod.firestore),
+  {
+    ssr: false,
+  }
+)
 
 const style = {
   position: 'absolute',
@@ -114,6 +122,12 @@ export default function Home() {
   useEffect(() => {
     updateInventory()
   }, [])
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && Firestore) {
+      updateInventory()
+    }
+  }, [Firestore])
 
   const handleCloseSnackbar = () => setSnackbarOpen(false)
   const filteredInventory = inventory.filter((item) =>
